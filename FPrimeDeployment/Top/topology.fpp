@@ -74,8 +74,10 @@ module FPrimeApp {
     }
 
     connections Routing {
-      ComCcsds.fprimeRouter.commandOut -> CdhCore.cmdDisp.seqCmdBuff
-      CdhCore.cmdDisp.seqCmdStatus     -> ComCcsds.fprimeRouter.cmdResponseIn
+      # The router instance is FPrimeCfs.CfsRouter, selected via the ComCcsdsRouterConfig
+      # configuration override (fprime_config/config/ComCcsdsRouterConfig.fpp)
+      ComCcsds.router.commandOut[0] -> CdhCore.cmdDisp.seqCmdBuff
+      CdhCore.cmdDisp.seqCmdStatus  -> ComCcsds.router.cmdResponseIn
     }
     connections Queueing {
       CdhCore.events.PktSend  -> ComCcsds.comQueue.comPacketQueueIn[ComCcsds.Ports_ComPacketQueue.EVENTS]
