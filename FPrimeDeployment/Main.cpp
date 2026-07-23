@@ -100,7 +100,8 @@ CFE_Status_t FPRIME_APP_Init(FPrimeApp::TopologyState& inputs)
     {
         printf("Subscribing to cFS messages...\n");
         FPrimeApp::cfsBridge.subscribe(ComCfg::Apid::FW_PACKET_COMMAND);
-        FPrimeApp::cfsBridge.subscribeCfsCommand(ComCfg::Apid::CFS_SCH_TICK);
+        FPrimeApp::cfsBridge.subscribeCfs(ComCfg::Apid::CFS_SCH_TICK,
+                                          FPrimeCfs::CfsBridge::CfsMessageType::COMMAND);
     }
     printf("Setting up the topology, yo!\n");
     OS_TaskInstallDeleteHandler(&FPRIME_APP_delete_callback);
