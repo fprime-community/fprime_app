@@ -8,28 +8,16 @@
 // Note: Uncomment when using Svc:TlmPacketizer
 //#include <FPrimeDeployment/Top/FPrimeDeploymentPacketsAc.hpp>
 
-// Necessary project-specified types
-#include <Fw/Types/MallocAllocator.hpp>
-
 // Public functions for use in main program are namespaced with deployment module FPrimeApp
 // This is also the namespace where the topology components are instantiated by FPP.
 namespace FPrimeApp {
 
-// Instantiate a malloc allocator for cmdSeq buffer allocation
-Fw::MallocAllocator mallocator;
-
-// The reference topology divides the incoming clock signal (1Hz) into sub-signals: 1Hz, 1/2Hz, and 1/4Hz with 0 offset
+// The topology divides the incoming scheduler tick into sub-signals; only the 1x divisor is used
 const Svc::RateGroupDriver::DividerSet rateGroupDivisorsSet{{{1, 0}, {2, 0}, {4, 0}}};
 
-// Rate groups may supply a context token to each of the attached children whose purpose is set by the project. The
-// reference topology sets each token to zero as these contexts are unused in this project.
+// Rate groups may supply a context token to each of the attached children whose purpose is set by the project.
+// Each token is set to zero as these contexts are unused in this project.
 Svc::ActiveRateGroup::ContextArray rateGroup1Context(0);
-Svc::ActiveRateGroup::ContextArray rateGroup2Context(0);
-Svc::ActiveRateGroup::ContextArray rateGroup3Context(0);
-
-enum TopologyConstants {
-    COMM_PRIORITY = 34,
-};
 
 /**
  * \brief configure/setup components in project-specific way
