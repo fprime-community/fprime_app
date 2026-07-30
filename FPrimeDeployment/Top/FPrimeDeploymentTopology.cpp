@@ -12,8 +12,9 @@
 // This is also the namespace where the topology components are instantiated by FPP.
 namespace FPrimeApp {
 
-// The topology divides the incoming scheduler tick into sub-signals; only the 1x divisor is used
-const Svc::RateGroupDriver::DividerSet rateGroupDivisorsSet{{{1, 0}, {2, 0}, {4, 0}}};
+// The topology has a single rate group driven at the scheduler tick rate; a divisor of 0 marks
+// the remaining driver outputs unused
+const Svc::RateGroupDriver::DividerSet rateGroupDivisorsSet{{{1, 0}, {0, 0}, {0, 0}}};
 
 // Rate groups may supply a context token to each of the attached children whose purpose is set by the project.
 // Each token is set to zero as these contexts are unused in this project.
