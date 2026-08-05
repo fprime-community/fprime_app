@@ -7,12 +7,12 @@
 #define FPRIMEDEPLOYMENT_FPRIMEDEPLOYMENTTOPOLOGYDEFS_HPP
 
 // Subtopology PingEntries includes
-#include "Svc/Subtopologies/CdhCore/PingEntries.hpp"
-#include "Svc/Subtopologies/ComCcsds/PingEntries.hpp"
+#include "FPrimeCfs/Subtopologies/CfsCore/PingEntries.hpp"
+#include "FPrimeCfs/Subtopologies/ComCfs/PingEntries.hpp"
 
 // SubtopologyTopologyDefs includes
-#include "Svc/Subtopologies/CdhCore/SubtopologyTopologyDefs.hpp"
-#include "Svc/Subtopologies/ComCcsds/SubtopologyTopologyDefs.hpp"
+#include "FPrimeCfs/Subtopologies/CfsCore/SubtopologyTopologyDefs.hpp"
+#include "FPrimeCfs/Subtopologies/ComCfs/SubtopologyTopologyDefs.hpp"
 
 // Include autocoded FPP constants
 #include "FPrimeDeployment/Top/FppConstantsAc.hpp"
@@ -52,10 +52,8 @@ namespace FPrimeApp {
  * contents are entirely up to the definition of the project. This deployment uses subtopologies.
  */
 struct TopologyState {
-    const char* hostname;   //!< Hostname for TCP communication
-    U16 port;              //!< Port for TCP communication
-    CdhCore::SubtopologyState cdhCore;           //!< Subtopology state for CdhCore
-    ComCcsds::SubtopologyState comCcsds;         //!< Subtopology state for ComCcsds
+    CfsCore::SubtopologyState cfsCore;   //!< Subtopology state for CfsCore
+    ComCfs::SubtopologyState comCfs;     //!< Subtopology state for ComCfs
 };
 
 namespace PingEntries = ::PingEntries;

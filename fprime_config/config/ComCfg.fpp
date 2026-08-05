@@ -56,6 +56,7 @@ module ComCfg {
         apid: Apid                  @< 11 bits APID in CCSDS
         transmissionType: TransmissionType @< REQUIRED: Type of transmission (command or telemetry). Default: telemetry
         messageId: U16              @< REQUIRED: CFS Message ID. Default: 0xFFFF (read runtime configuration)
+        functionCode: U8            @< cFS command function code, placed in the command secondary header by FPrimeCfs.CfsCmdFramer
         sequenceCount: U16          @< 14 bit Sequence count - sequence count is incremented per APID
         vcId: U8                    @< 6 bit Virtual Channel ID - used for AOS, TC, and TM Protocols
         pvn: Pvn                    @< Packet Version Number - used for AOS deframing to identify packet type
@@ -65,6 +66,7 @@ module ComCfg {
     } default {
         comQueueIndex = 0
         apid = Apid.FW_PACKET_UNKNOWN
+        functionCode = 0
         sequenceCount = 0
         vcId = 1
         transmissionType = TransmissionType.TELEMETRY

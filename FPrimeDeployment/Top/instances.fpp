@@ -12,6 +12,8 @@ module FPrimeApp {
   #   CC  = Component digits (00, 01, 02, etc.)
   #   xxx = Reserved for internal component items (events, commands, telemetry)
   #
+  # The CfsCore and ComCfs subtopologies use their own base IDs defined in
+  # CfsCoreConfig and ComCfsConfig respectively.
 
   # ----------------------------------------------------------------------
   # Defaults
@@ -31,20 +33,10 @@ module FPrimeApp {
     stack size Default.STACK_SIZE \
     priority 43
 
-  @ Instance to bridge F Prime communication to the CFS bus
-  instance cfsBridge: FPrimeCfs.CfsBridge base id 0x10002000 \
-    queue size Default.QUEUE_SIZE
-
   # ----------------------------------------------------------------------
   # Passive component instances
   # ----------------------------------------------------------------------
 
-  instance chronoTime: Svc.ChronoTime base id 0x10010000
-
   instance rateGroupDriver: Svc.RateGroupDriver base id 0x10011000
-
-  @ Rate group driver ticked by cFS scheduler (SCH) messages
-  instance schAppDriver: FPrimeCfs.SchAppDriver base id 0x10012000
-
 
 }
