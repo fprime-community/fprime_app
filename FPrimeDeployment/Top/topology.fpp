@@ -8,82 +8,80 @@ module FPrimeApp {
     rateGroup1
   }
 
+  enum Ports_ComPacketQueue {
+    EVENTS,
+    TELEMETRY
+  }
+
 
   topology FPrimeDeployment {
 
   # ----------------------------------------------------------------------
   # Subtopology imports
   # ----------------------------------------------------------------------
-    import CdhCore.Subtopology
-    import ComCcsds.SpacePacketFraming
+    import CfsCore.Subtopology
+    import ComCfs.Subtopology
 
   # ----------------------------------------------------------------------
   # Instances used in the topology
   # ----------------------------------------------------------------------
-    instance chronoTime
-    instance schAppDriver
     instance rateGroupDriver
     instance rateGroup1
-    instance cfsBridge
 
   # ----------------------------------------------------------------------
   # Pattern graph specifiers
   # ----------------------------------------------------------------------
 
-    command connections instance CdhCore.cmdDisp
-    event connections instance CdhCore.events
-    telemetry connections instance CdhCore.tlmSend
-    text event connections instance CdhCore.textLogger
-    health connections instance CdhCore.$health
-    time connections instance chronoTime
+    command connections instance CfsCore.cmdDisp
+    event connections instance CfsCore.events
+    telemetry connections instance CfsCore.tlmSend
+    text event connections instance CfsCore.evsMirror
+    health connections instance CfsCore.$health
+    time connections instance CfsCore.cfsTime
 
   # ----------------------------------------------------------------------
   # Telemetry packets (only used when TlmPacketizer is used)
   # ----------------------------------------------------------------------
 
-    # include "FPrimeDeploymentPackets.fppi"
+    include "FPrimeDeploymentPackets.fppi"
 
   # ----------------------------------------------------------------------
   # Direct graph specifiers
   # ----------------------------------------------------------------------
 
+    connections Scheduler {
+      # cFS scheduler (SCH) tick messages, routed by the ComCfs router to the
+      # CfsCore SchAppDriver, drive the rate group
+      ComCfs.Subtopology.cfsCommandOut[0]    -> CfsCore.Subtopology.cfsCommandIn
+      CfsCore.Subtopology.schBufferReturnOut -> ComCfs.Subtopology.bufferReturnIn
+      CfsCore.Subtopology.cycleOut           -> rateGroupDriver.CycleIn
+    }
 
     connections RateGroups {
-      # cFS scheduler (SCH) tick messages, routed to the SchAppDriver, drive the rate group
-      ComCcsds.fprimeRouter.cfsCommandOut[0] -> schAppDriver.cfsCommandIn
-      schAppDriver.bufferReturnOut           -> ComCcsds.fprimeRouter.bufferReturnIn
-      schAppDriver.CycleOut                  -> rateGroupDriver.CycleIn
-
       # Rate group 1
       rateGroupDriver.CycleOut[Ports_RateGroups.rateGroup1] -> rateGroup1.CycleIn
-      rateGroup1.RateGroupMemberOut[0] -> CdhCore.cmdDisp.run
-      rateGroup1.RateGroupMemberOut[1] -> CdhCore.tlmSend.Run
-      rateGroup1.RateGroupMemberOut[2] -> CdhCore.$health.Run
-      rateGroup1.RateGroupMemberOut[3] -> ComCcsds.comQueue.run
-      rateGroup1.RateGroupMemberOut[4] -> ComCcsds.aggregator.timeout
-      rateGroup1.RateGroupMemberOut[5] -> ComCcsds.commsBufferManager.schedIn
+      rateGroup1.RateGroupMemberOut[0] -> CfsCore.Subtopology.cmdDispRun
+      rateGroup1.RateGroupMemberOut[1] -> CfsCore.Subtopology.tlmSendRun
+      rateGroup1.RateGroupMemberOut[2] -> CfsCore.Subtopology.healthRun
+      rateGroup1.RateGroupMemberOut[3] -> CfsCore.Subtopology.eventsRun
+      rateGroup1.RateGroupMemberOut[4] -> ComCfs.Subtopology.bufferManagerSchedIn
     }
 
-    connections CfsBridge {
-      # Downlink: framing layer -> bridge -> cFS software bus
-      ComCcsds.SpacePacketFraming.dataOut -> cfsBridge.dataIn
-      cfsBridge.dataReturnOut             -> ComCcsds.SpacePacketFraming.dataReturnIn
-      cfsBridge.comStatusOut              -> ComCcsds.SpacePacketFraming.comStatusIn
-
-      # Uplink: cFS software bus -> bridge -> framing layer
-      cfsBridge.dataOut                         -> ComCcsds.SpacePacketFraming.dataIn
-      ComCcsds.SpacePacketFraming.dataReturnOut -> cfsBridge.dataReturnIn
+    connections Commanding {
+      # Routed F Prime command packets to the command dispatcher
+      ComCfs.Subtopology.commandOut[0]  -> CfsCore.Subtopology.seqCmdBuff
+      CfsCore.Subtopology.seqCmdStatus  -> ComCfs.Subtopology.cmdResponseIn
     }
 
-    connections Routing {
-      # The router instance is FPrimeCfs.CfsRouter, selected via the ComCcsdsRouterConfig
-      # configuration override (fprime_config/config/ComCcsdsRouterConfig.fpp)
-      ComCcsds.fprimeRouter.commandOut[0] -> CdhCore.cmdDisp.seqCmdBuff
-      CdhCore.cmdDisp.seqCmdStatus   -> ComCcsds.fprimeRouter.cmdResponseIn
+    connections Downlink {
+      # Event and packetized telemetry downlink through the telemetry app bridge
+      CfsCore.Subtopology.eventsPktSend      -> ComCfs.Subtopology.comIn[Ports_ComPacketQueue.EVENTS]
+      CfsCore.Subtopology.tlmSendPktSend[0]  -> ComCfs.Subtopology.comIn[Ports_ComPacketQueue.TELEMETRY]
     }
-    connections Queueing {
-      CdhCore.events.PktSend  -> ComCcsds.comQueue.comPacketQueueIn[ComCcsds.Ports_ComPacketQueue.EVENTS]
-      CdhCore.tlmSend.PktSend -> ComCcsds.comQueue.comPacketQueueIn[ComCcsds.Ports_ComPacketQueue.TELEMETRY]
+
+    connections Time {
+      # cFS time conversion for the telemetry framer secondary headers
+      ComCfs.Subtopology.cfsTimeConvertOut -> CfsCore.Subtopology.cfsTimeConvert
     }
 
   }

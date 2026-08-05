@@ -63,7 +63,7 @@ void FPRIME_APP_Main(void) {
     // through the bridge and routed to the SchAppDriver; no polling timer is needed
     while (CFE_ES_RunLoop(&run_status) == true)
     {
-        FPrimeApp::cfsBridge.process();
+        ComCfs::cfsBridge.process();
     }
     FPRIME_APP_Shutdown(inputs, run_status);
 }
@@ -82,25 +82,20 @@ CFE_Status_t FPRIME_APP_Init(FPrimeApp::TopologyState& inputs)
         CFE_ES_WriteToSysLog("F Prime App: Error Registering Events, RC = 0x%08lX\n",
                              static_cast<unsigned long>(status));
     }
-    else
-    {
-        status = FPrimeApp::cfsBridge.configure(FPRIME_APP_PLATFORM_PIPE_DEPTH, FPRIME_APP_PLATFORM_PIPE_NAME);
-        if (status != CFE_SUCCESS)
-        {
-            CFE_EVS_SendEvent(FPRIME_APP_PIPE_ERR_EID, CFE_EVS_EventType_ERROR,
-                              "F Prime App: Error creating SB Command Pipe, RC = 0x%08lX",
-                              static_cast<unsigned long>(status));
-        }
-    }
+    // The ComCfs subtopology configures the bridge pipe during topology setup
+    // (configComponents phase); subscriptions are added after setup below
     if (status == CFE_SUCCESS)
     {
+        OS_TaskInstallDeleteHandler(&FPRIME_APP_delete_callback);
+        FPrimeApp::setupTopology(inputs);
+
         // F Prime commands arrive as cFS command packets (secondary header flag set)
-        status = FPrimeApp::cfsBridge.subscribeCfs(ComCfg::Apid::FW_PACKET_COMMAND,
-                                                   FPrimeCfs::CfsBridge::CfsMessageType::COMMAND);
+        status = ComCfs::cfsBridge.subscribeCfs(ComCfg::Apid::FW_PACKET_COMMAND,
+                                                FPrimeCfs::CfsBridge::CfsMessageType::COMMAND);
         if (status == CFE_SUCCESS)
         {
-            status = FPrimeApp::cfsBridge.subscribeCfs(ComCfg::Apid::CFS_SCH_TICK,
-                                                       FPrimeCfs::CfsBridge::CfsMessageType::COMMAND);
+            status = ComCfs::cfsBridge.subscribeCfs(ComCfg::Apid::CFS_SCH_TICK,
+                                                    FPrimeCfs::CfsBridge::CfsMessageType::COMMAND);
         }
         if (status != CFE_SUCCESS)
         {
@@ -110,12 +105,8 @@ CFE_Status_t FPRIME_APP_Init(FPrimeApp::TopologyState& inputs)
         }
     }
 
-    // Only bring up the topology (and its teardown handler) when initialization succeeded;
-    // otherwise the caller exits the application without starting any component threads
     if (status == CFE_SUCCESS)
     {
-        OS_TaskInstallDeleteHandler(&FPRIME_APP_delete_callback);
-        FPrimeApp::setupTopology(inputs);
 
         CFE_Config_GetVersionString(VersionString, FPRIME_APP_CFG_MAX_VERSION_STR_LEN, "F Prime App", FPRIME_APP_VERSION,
                                     FPRIME_APP_BUILD_CODENAME, FPRIME_APP_LAST_OFFICIAL);

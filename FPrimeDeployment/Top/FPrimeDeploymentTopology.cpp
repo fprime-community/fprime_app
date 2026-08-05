@@ -5,8 +5,8 @@
 // ======================================================================
 // Provides access to autocoded functions
 #include <FPrimeDeployment/Top/FPrimeDeploymentTopologyAc.hpp>
-// Note: Uncomment when using Svc:TlmPacketizer
-//#include <FPrimeDeployment/Top/FPrimeDeploymentPacketsAc.hpp>
+// Telemetry packet list for the Svc.TlmPacketizer instance (CfsCore.tlmSend)
+#include <FPrimeDeployment/Top/FPrimeDeployment_FPrimeDeploymentPacketsTlmPacketsAc.hpp>
 
 // Public functions for use in main program are namespaced with deployment module FPrimeApp
 // This is also the namespace where the topology components are instantiated by FPP.
@@ -33,6 +33,11 @@ void configureTopology() {
 
     // Rate groups require context arrays.
     rateGroup1.configure(rateGroup1Context);
+
+    // Supply the deployment's generated telemetry packet list to the CfsCore
+    // packetizer (replacing the subtopology's default empty packet list)
+    CfsCore::tlmSend.setPacketList(FPrimeApp::FPrimeDeployment_FPrimeDeploymentPacketsTlmPackets::packetList,
+                                   FPrimeApp::FPrimeDeployment_FPrimeDeploymentPacketsTlmPackets::omittedChannels, 0);
 }
 
 void setupTopology(const TopologyState& state) {
@@ -48,8 +53,9 @@ void setupTopology(const TopologyState& state) {
     configComponents(state);
     // Project-specific component configuration. Function provided above. May be inlined, if desired.
     configureTopology();
-    // Autocoded parameter loading. Function provided by autocoder.
-    loadParameters();
+    // Note: autocoded parameter loading (loadParameters()) is not called: this deployment
+    // has no parameter database, and components with parameters (e.g. the TlmPacketizer)
+    // fall back to their default parameter values
     // Autocoded task kick-off (active components). Function provided by autocoder.
     startTasks(state);
 }
