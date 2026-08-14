@@ -31,5 +31,6 @@ add_dependencies(fprime_app ${FPRIME_CURRENT_MODULE}_Top)
 set_target_properties(fprime_app PROPERTIES FPRIME_TYPE Deployment)
 fprime_attach_custom_targets(fprime_app)
 set(FPRIME_USE_PLAIN_LINK_SIGNATURE ON)
-fprime_target_implementations(fprime_app)
+# Create F Prime tasks as cFE ES child tasks so they are valid cFS tasks
+fprime_target_implementations(fprime_app Os_Task_Cfs)
 
