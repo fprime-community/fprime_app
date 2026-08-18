@@ -14,7 +14,7 @@ module FPrimeApp {
   }
 
 
-  topology FPrimeDeployment {
+  deployment topology FPrimeDeployment {
 
   # ----------------------------------------------------------------------
   # Subtopology imports
