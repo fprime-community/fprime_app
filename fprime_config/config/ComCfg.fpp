@@ -22,6 +22,9 @@ module ComCfg {
     @ Aggregation buffer for ComAggregator component
     constant AggregationSize = TmFrameFixedSize - 6 - 6 - 1 - 2  # 2 header (6) + 1 idle byte + 2 trailer bytes
 
+    @ Aggregation buffer for ComAggregator component when packet spanning is enabled (full TM data field)
+    constant AggregationSpanningSize = TmFrameFixedSize - 6 - 2  # TM header (6) + trailer (2) bytes
+
     @ Packet Version Numbers are 3 bits with only 2 currently valid values
     dictionary enum Pvn : U8 {
         SPACE_PACKET_PROTOCOL         = 0x0   @< Fully Featured CCSDS Space Packet Protocol
@@ -67,6 +70,7 @@ module ComCfg {
         sendNow: bool               @< Flag to AOS Framer that the Frame this packet goes into should be sent ASAP
         hasSecHdr: bool             @< Flag to indicate if the packet has a secondary header, used for AOS deframing
         sequenceFlags: U8           @< 2 bit Sequence flags (0b00=continuation, 0b01=first, 0b10=last, 0b11=unsegmented)
+        firstHeaderPointer: U16     @< 11 bit TM First Header Pointer - set by ComAggregator, read by TmFramer
     } default {
         comQueueIndex = 0
         apid = Apid.FW_PACKET_UNKNOWN
@@ -79,6 +83,7 @@ module ComCfg {
         sendNow = false
         hasSecHdr = false
         sequenceFlags = 0x3
+        firstHeaderPointer = 0
     }
 
 }
