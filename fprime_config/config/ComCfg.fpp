@@ -67,6 +67,7 @@ module ComCfg {
         sendNow: bool               @< Flag to AOS Framer that the Frame this packet goes into should be sent ASAP
         hasSecHdr: bool             @< Flag to indicate if the packet has a secondary header, used for AOS deframing
         sequenceFlags: U8           @< 2 bit Sequence flags (0b00=continuation, 0b01=first, 0b10=last, 0b11=unsegmented)
+        firstHeaderPointer: U16     @< 11 bit TM First Header Pointer - set by ComAggregator, read by TmFramer
     } default {
         comQueueIndex = 0
         apid = Apid.FW_PACKET_UNKNOWN
@@ -79,6 +80,7 @@ module ComCfg {
         sendNow = false
         hasSecHdr = false
         sequenceFlags = 0x3
+        firstHeaderPointer = 0
     }
 
 }
