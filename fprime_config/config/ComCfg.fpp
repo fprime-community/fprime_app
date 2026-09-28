@@ -54,10 +54,17 @@ module ComCfg {
         INVALID_UNINITIALIZED    = 0x0800  @< Anything equal or higher value is invalid and should not be used
     } default INVALID_UNINITIALIZED
 
+    @ Packet type in the Space Packet Primary Header
+    enum SppPacketType : U8 {
+        SPP_TELEMETRY = 0  @< Telemetry / data packet (downlink)
+        SPP_COMMAND   = 1  @< Telecommand packet (uplink)
+    } default SPP_TELEMETRY
+
     @ Type used to pass context info between components during framing/deframing
     struct FrameContext {
         comQueueIndex: FwIndexType  @< Queue Index used by the ComQueue, other components shall not modify
         apid: Apid                  @< 11 bits APID in CCSDS
+        pktType: SppPacketType      @< 1 bit packet type in space packet primary header
         transmissionType: TransmissionType @< REQUIRED: Type of transmission (command or telemetry). Default: telemetry
         messageId: U16              @< REQUIRED: CFS Message ID. Default: 0xFFFF (read runtime configuration)
         functionCode: U8            @< cFS command function code, placed in the command secondary header by FPrimeCfs.CfsCmdFramer
@@ -71,6 +78,7 @@ module ComCfg {
     } default {
         comQueueIndex = 0
         apid = Apid.FW_PACKET_UNKNOWN
+        pktType = SppPacketType.SPP_TELEMETRY
         functionCode = 0
         sequenceCount = 0
         vcId = 1
