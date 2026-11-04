@@ -14,15 +14,16 @@ bytes and sets the destination APID and function code in the frame context.
 
 | Name | Kind | Type | Description |
 | --- | --- | --- | --- |
-| `run` | sync input | `Svc.Sched` | Rate-group tick |
+| `run` | guarded input | `Svc.Sched` | Rate-group tick |
 | `cfsCommandOut` | output | `Svc.ComDataWithContext` | Command payload; `FrameContext.apid`/`functionCode` set to the configured command APID and `ECHO_FUNCTION_CODE` (1) |
 | `cfsCommandReturnIn` | sync input | `Svc.ComDataWithContext` | Returns the command buffer once the bridge has copied it |
-| `cfsTelemetryIn` | sync input | `FPrimeCfs.CfsTelemetry` | Raw cFS telemetry echo from the router |
+| `cfsTelemetryIn` | guarded input | `FPrimeCfs.CfsTelemetry` | Raw cFS telemetry echo from the router |
 | `bufferReturnOut` | output | `Fw.BufferSend` | Returns the telemetry payload buffer to the router |
 
 ## Behavior
 
-`configure(commandApid)` sets the APID carried in the frame context of every command. On every tenth `run`
+`run` and `cfsTelemetryIn` are guarded so the outstanding-command state is never touched concurrently by the rate
+group and the cFS bridge's polling thread. `configure(commandApid)` sets the APID carried in the frame context of every command. On every tenth `run`
 tick:
 
 1. If the previous command buffer has not been returned on `cfsCommandReturnIn`, the command is skipped with
