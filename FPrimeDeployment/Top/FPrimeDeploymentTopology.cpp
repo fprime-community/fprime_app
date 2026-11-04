@@ -33,6 +33,9 @@ void configureTopology() {
 
     // Rate groups require context arrays.
     rateGroup1.configure(rateGroup1Context);
+    // Raw cFS inter-app echo loops: APIDs of the messages each component originates
+    echoResponder.configure(ComCfg::Apid::FPRIME_ECHO_TLM);
+    echoCommander.configure(ComCfg::Apid::RAW_ECHO_CMD);
 
     // Supply the deployment's generated telemetry packet list to the CfsCore
     // packetizer (replacing the subtopology's default empty packet list)

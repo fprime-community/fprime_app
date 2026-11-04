@@ -97,6 +97,17 @@ CFE_Status_t FPRIME_APP_Init(FPrimeApp::TopologyState& inputs)
             status = ComCfs::cfsBridge.subscribeCfs(ComCfg::Apid::CFS_SCH_TICK,
                                                     FPrimeCfs::CfsBridge::CfsMessageType::COMMAND);
         }
+        // Raw cFS inter-app echo loops (see apps/raw_commander, apps/raw_commanded)
+        if (status == CFE_SUCCESS)
+        {
+            status = ComCfs::cfsBridge.subscribeCfs(ComCfg::Apid::FPRIME_ECHO_CMD,
+                                                    FPrimeCfs::CfsBridge::CfsMessageType::COMMAND);
+        }
+        if (status == CFE_SUCCESS)
+        {
+            status = ComCfs::cfsBridge.subscribeCfs(ComCfg::Apid::RAW_ECHO_TLM,
+                                                    FPrimeCfs::CfsBridge::CfsMessageType::TELEMETRY);
+        }
         if (status != CFE_SUCCESS)
         {
             CFE_EVS_SendEvent(FPRIME_APP_SUBSCRIBE_ERR_EID, CFE_EVS_EventType_ERROR,
