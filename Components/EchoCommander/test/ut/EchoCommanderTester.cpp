@@ -29,11 +29,19 @@ Fw::Buffer EchoCommanderTester ::tickUntilCommand() {
     return this->fromPortHistory_cfsCommandOut->at(before).data;
 }
 
-void EchoCommanderTester ::deliverEcho(const Fw::Buffer& command, bool corrupt) {
-    const FwSizeType size = command.getSize();
+Fw::Buffer EchoCommanderTester ::sendAndReturnCommand() {
+    Fw::Buffer command = this->tickUntilCommand();
+    ComCfg::FrameContext context = this->fromPortHistory_cfsCommandOut->at(0).context;
+    this->invoke_to_cfsCommandReturnIn(0, command, context);
+    this->clearHistory();
+    return command;
+}
+
+void EchoCommanderTester ::deliverEcho(const Fw::Buffer& command, bool corrupt, FwSizeType truncateBy) {
+    const FwSizeType size = command.getSize() - truncateBy;
     FW_ASSERT(size <= sizeof(this->m_telemetryStorage), static_cast<FwAssertArgType>(size));
     (void)std::memcpy(this->m_telemetryStorage, command.getData(), size);
-    if (corrupt) {
+    if (corrupt && (size > 0)) {
         this->m_telemetryStorage[size - 1] = static_cast<U8>(~this->m_telemetryStorage[size - 1]);
     }
     Fw::Buffer telemetry(this->m_telemetryStorage, static_cast<Fw::Buffer::SizeType>(size));
@@ -54,8 +62,8 @@ void EchoCommanderTester ::testPeriodicCommand() {
 
     this->invoke_to_run(0, 0);
     ASSERT_from_cfsCommandOut_SIZE(1);
-    const Fw::Buffer& command = this->fromPortHistory_cfsCommandOut->at(0).data;
-    const ComCfg::FrameContext& context = this->fromPortHistory_cfsCommandOut->at(0).context;
+    Fw::Buffer command = this->fromPortHistory_cfsCommandOut->at(0).data;
+    ComCfg::FrameContext context = this->fromPortHistory_cfsCommandOut->at(0).context;
     ASSERT_GE(command.getSize(), 1u);
     ASSERT_LE(command.getSize(), static_cast<Fw::Buffer::SizeType>(ECHO_COMMANDER_MAX_PAYLOAD));
     ASSERT_EQ(context.get_apid(), CMD_APID);
@@ -67,7 +75,7 @@ void EchoCommanderTester ::testPeriodicCommand() {
     ASSERT_TLM_CommandsSent(0, 1);
 
     // Payloads differ between commands (random), and the sequence advances
-    this->invoke_to_cfsCommandReturnIn(0, const_cast<Fw::Buffer&>(command), context);
+    this->invoke_to_cfsCommandReturnIn(0, command, context);
     this->deliverEcho(command, false);
     this->clearHistory();
     Fw::Buffer second = this->tickUntilCommand();
@@ -76,10 +84,7 @@ void EchoCommanderTester ::testPeriodicCommand() {
 }
 
 void EchoCommanderTester ::testEchoMatched() {
-    Fw::Buffer command = this->tickUntilCommand();
-    ComCfg::FrameContext context = this->fromPortHistory_cfsCommandOut->at(0).context;
-    this->invoke_to_cfsCommandReturnIn(0, command, context);
-    this->clearHistory();
+    Fw::Buffer command = this->sendAndReturnCommand();
 
     this->deliverEcho(command, false);
     ASSERT_from_bufferReturnOut_SIZE(1);
@@ -93,10 +98,7 @@ void EchoCommanderTester ::testEchoMatched() {
 }
 
 void EchoCommanderTester ::testEchoMismatch() {
-    Fw::Buffer command = this->tickUntilCommand();
-    ComCfg::FrameContext context = this->fromPortHistory_cfsCommandOut->at(0).context;
-    this->invoke_to_cfsCommandReturnIn(0, command, context);
-    this->clearHistory();
+    Fw::Buffer command = this->sendAndReturnCommand();
 
     this->deliverEcho(command, true);
     ASSERT_from_bufferReturnOut_SIZE(1);
@@ -127,10 +129,7 @@ void EchoCommanderTester ::testEchoUnexpected() {
 }
 
 void EchoCommanderTester ::testEchoTimeout() {
-    Fw::Buffer command = this->tickUntilCommand();
-    ComCfg::FrameContext context = this->fromPortHistory_cfsCommandOut->at(0).context;
-    this->invoke_to_cfsCommandReturnIn(0, command, context);
-    this->clearHistory();
+    Fw::Buffer command = this->sendAndReturnCommand();
 
     // No echo arrives: the next command reports the timeout and is still sent
     this->tickUntilCommand();
@@ -155,6 +154,17 @@ void EchoCommanderTester ::testCommandBusy() {
     ASSERT_EVENTS_CommandBusy_SIZE(1);
     ASSERT_TLM_CommandsBusy_SIZE(1);
     ASSERT_TLM_CommandsBusy(0, 1);
+}
+
+
+void EchoCommanderTester ::testEchoTruncated() {
+    Fw::Buffer command = this->sendAndReturnCommand();
+    // Same leading bytes, one byte short: sizes differ, so it is a mismatch
+    this->deliverEcho(command, false, 1);
+    ASSERT_EVENTS_EchoMismatch_SIZE(1);
+    ASSERT_EVENTS_EchoMismatch(0, 1, static_cast<U32>(command.getSize()), static_cast<U32>(command.getSize() - 1));
+    ASSERT_TLM_EchoMismatches(0, 1);
+    ASSERT_EVENTS_EchoMatched_SIZE(0);
 }
 
 }  // namespace FPrimeApp

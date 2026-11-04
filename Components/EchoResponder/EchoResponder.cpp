@@ -4,6 +4,8 @@
 
 namespace FPrimeApp {
 
+constexpr U8 EchoResponder::EXPECTED_FUNCTION_CODE;
+
 EchoResponder ::EchoResponder(const char* const compName)
     : EchoResponderComponentBase(compName),
       m_telemetryApid(ComCfg::Apid::FW_PACKET_UNKNOWN),

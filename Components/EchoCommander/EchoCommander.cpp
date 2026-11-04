@@ -4,6 +4,8 @@
 
 namespace FPrimeApp {
 
+constexpr U8 EchoCommander::ECHO_FUNCTION_CODE;
+
 EchoCommander ::EchoCommander(const char* const compName)
     : EchoCommanderComponentBase(compName),
       m_commandApid(ComCfg::Apid::FW_PACKET_UNKNOWN),

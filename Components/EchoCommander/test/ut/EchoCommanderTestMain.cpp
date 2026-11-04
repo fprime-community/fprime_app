@@ -48,6 +48,13 @@ TEST(OffNominal, CommandBusy) {
     tester.testCommandBusy();
 }
 
+TEST(OffNominal, EchoTruncated) {
+    COMMENT("A telemetry echo shorter than the sent payload is reported as a mismatch with both sizes");
+    REQUIREMENT("FPRIMEAPP-ECHOCOMMANDER-002");
+    FPrimeApp::EchoCommanderTester tester;
+    tester.testEchoTruncated();
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     STest::Random::seed();

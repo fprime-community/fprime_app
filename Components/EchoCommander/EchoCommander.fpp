@@ -17,7 +17,7 @@ module FPrimeApp {
         # ----------------------------------------------------------------------
 
         @ Rate-group tick
-        sync input port run: Svc.Sched
+        guarded input port run: Svc.Sched
 
         @ Raw command payload with frame context (APID, function code set here); framed as a cFS command downstream
         output port cfsCommandOut: Svc.ComDataWithContext
@@ -26,7 +26,7 @@ module FPrimeApp {
         sync input port cfsCommandReturnIn: Svc.ComDataWithContext
 
         @ Raw cFS telemetry echo routed by APID
-        sync input port cfsTelemetryIn: FPrimeCfs.CfsTelemetry
+        guarded input port cfsTelemetryIn: FPrimeCfs.CfsTelemetry
 
         @ Returns telemetry payload buffers to the router after processing
         output port bufferReturnOut: Fw.BufferSend

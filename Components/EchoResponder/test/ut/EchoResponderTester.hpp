@@ -16,6 +16,7 @@ class EchoResponderTester final : public EchoResponderGTestBase {
     ~EchoResponderTester();
 
     void testEcho();
+    void testEchoEmpty();
     void testUnexpectedFunctionCode();
     void testPayloadTooLarge();
     void testEchoBusy();

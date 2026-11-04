@@ -23,3 +23,12 @@ reports the application version.
 This application is not built standalone: it is compiled as part of a cFS mission build. See
 [fprime_cfs_reference](https://github.com/fprime-community/fprime_cfs_reference) for a complete
 system that builds and runs this application.
+
+## Raw cFS echo demonstration
+
+Besides the F Prime command/telemetry traffic, the deployment subscribes to two native cFS messages for the raw
+inter-application echo demonstration: command APID `0x0A0` (message id `0x18A0`, function code 1, from the
+reference's `raw_commander` app) routed to `FPrimeApp::EchoResponder`, and telemetry APID `0x0A3` (message id
+`0x08A3`, from the `raw_commanded` app) routed to `FPrimeApp::EchoCommander`. `EchoResponder` answers on telemetry
+APID `0x0A1` and `EchoCommander` commands APID `0x0A2`, function code 1, every 10 rate-group ticks. See
+`Components/EchoResponder/docs/sdd.md` and `Components/EchoCommander/docs/sdd.md`.

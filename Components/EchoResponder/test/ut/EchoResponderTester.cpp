@@ -123,4 +123,16 @@ void EchoResponderTester ::testEchoBusy() {
     ASSERT_EVENTS_EchoBusy_SIZE(0);
 }
 
+void EchoResponderTester ::testEchoEmpty() {
+    this->sendCommand(EchoResponder::EXPECTED_FUNCTION_CODE, 0);
+    ASSERT_from_cfsTelemetryOut_SIZE(1);
+    ASSERT_EQ(this->fromPortHistory_cfsTelemetryOut->at(0).data.getSize(), 0u);
+    ASSERT_EVENTS_CommandReceived_SIZE(1);
+    ASSERT_EVENTS_CommandReceived(0, EchoResponder::EXPECTED_FUNCTION_CODE, 0, 0);
+    ASSERT_EVENTS_EchoSent(0, 0);
+    ASSERT_TLM_CommandsReceived(0, 1);
+    ASSERT_from_bufferReturnOut_SIZE(1);
+}
+
 }  // namespace FPrimeApp
+

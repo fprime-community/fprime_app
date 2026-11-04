@@ -34,6 +34,13 @@ TEST(OffNominal, EchoBusy) {
     tester.testEchoBusy();
 }
 
+TEST(Nominal, EchoEmpty) {
+    COMMENT("A zero-length raw command is echoed as a zero-length telemetry payload");
+    REQUIREMENT("FPRIMEAPP-ECHORESPONDER-001");
+    FPrimeApp::EchoResponderTester tester;
+    tester.testEchoEmpty();
+}
+
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     STest::Random::seed();
