@@ -12,17 +12,11 @@ module FPrimeApp {
         # Ports
         # ----------------------------------------------------------------------
 
-        @ Raw cFS command (function code + payload) routed by (APID, function code)
-        sync input port cfsCommandIn: FPrimeCfs.CfsCommand
+        @ Routed raw cFS command from raw_commander and payload buffer return
+        import FPrimeCfs.CfsCommandHandler
 
-        @ Returns command payload buffers to the router after processing
-        output port bufferReturnOut: Fw.BufferSend
-
-        @ Raw echo payload with frame context (APID set here); framed as cFS telemetry downstream
-        output port cfsTelemetryOut: Svc.ComDataWithContext
-
-        @ Returns the echo buffer after the bridge has copied it
-        sync input port cfsTelemetryReturnIn: Svc.ComDataWithContext
+        @ Raw cFS telemetry echo toward the ComCfs telemetry framer
+        import FPrimeCfs.CfsTelemetryProducer
 
         # ----------------------------------------------------------------------
         # Events (each paired with an occurrence-counting channel)
