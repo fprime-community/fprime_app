@@ -23,7 +23,10 @@ void EchoResponder ::configure(ComCfg::Apid::T telemetryApid) {
     this->m_telemetryApid = telemetryApid;
 }
 
-void EchoResponder ::cfsCommandIn_handler(FwIndexType portNum, U8 functionCode, Fw::Buffer& data) {
+void EchoResponder ::cfsCommandIn_handler(FwIndexType portNum,
+                                          const ComCfg::Apid& apid,
+                                          U8 functionCode,
+                                          Fw::Buffer& data) {
     const U32 size = static_cast<U32>(data.getSize());
     if (functionCode != EXPECTED_FUNCTION_CODE) {
         this->m_unexpectedFunctionCodes++;

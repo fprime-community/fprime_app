@@ -28,7 +28,7 @@ Fw::Buffer EchoResponderTester ::sendCommand(U8 functionCode, FwSizeType size) {
         this->m_commandStorage[i] = static_cast<U8>(STest::Random::lowerUpper(0, 0xFF));
     }
     Fw::Buffer command(this->m_commandStorage, static_cast<Fw::Buffer::SizeType>(size));
-    this->invoke_to_cfsCommandIn(0, functionCode, command);
+    this->invoke_to_cfsCommandIn(0, ComCfg::Apid::FPRIME_ECHO_CMD, functionCode, command);
     return command;
 }
 

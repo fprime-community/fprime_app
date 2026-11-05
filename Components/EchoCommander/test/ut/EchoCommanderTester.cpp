@@ -45,7 +45,7 @@ void EchoCommanderTester ::deliverEcho(const Fw::Buffer& command, bool corrupt, 
         this->m_telemetryStorage[size - 1] = static_cast<U8>(~this->m_telemetryStorage[size - 1]);
     }
     Fw::Buffer telemetry(this->m_telemetryStorage, static_cast<Fw::Buffer::SizeType>(size));
-    this->invoke_to_cfsTelemetryIn(0, FPrimeCfs::CfsTime(0, 0), telemetry);
+    this->invoke_to_cfsTelemetryIn(0, ComCfg::Apid::RAW_ECHO_TLM, FPrimeCfs::CfsTime(0, 0), telemetry);
 }
 
 // ----------------------------------------------------------------------

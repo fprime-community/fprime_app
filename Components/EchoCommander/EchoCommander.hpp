@@ -22,7 +22,10 @@ class EchoCommander final : public EchoCommanderComponentBase {
     void cfsCommandReturnIn_handler(FwIndexType portNum,
                                     Fw::Buffer& data,
                                     const ComCfg::FrameContext& context) override;
-    void cfsTelemetryIn_handler(FwIndexType portNum, const FPrimeCfs::CfsTime& sysTime, Fw::Buffer& data) override;
+    void cfsTelemetryIn_handler(FwIndexType portNum,
+                                const ComCfg::Apid& apid,
+                                const FPrimeCfs::CfsTime& sysTime,
+                                Fw::Buffer& data) override;
 
     //! Next pseudo-random value (xorshift32)
     U32 nextRandom();

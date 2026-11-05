@@ -19,17 +19,11 @@ module FPrimeApp {
         @ Rate-group tick
         guarded input port run: Svc.Sched
 
-        @ Raw command payload with frame context (APID, function code set here); framed as a cFS command downstream
-        output port cfsCommandOut: Svc.ComDataWithContext
+        @ Raw cFS command toward the ComCfs command framer
+        import FPrimeCfs.CfsCommandProducer
 
-        @ Returns the command buffer after the bridge has copied it
-        sync input port cfsCommandReturnIn: Svc.ComDataWithContext
-
-        @ Raw cFS telemetry echo routed by APID
-        guarded input port cfsTelemetryIn: FPrimeCfs.CfsTelemetry
-
-        @ Returns telemetry payload buffers to the router after processing
-        output port bufferReturnOut: Fw.BufferSend
+        @ Routed raw cFS telemetry echo from raw_commanded and payload buffer return
+        import FPrimeCfs.CfsTelemetryHandler
 
         # ----------------------------------------------------------------------
         # Events (each paired with an occurrence-counting channel)

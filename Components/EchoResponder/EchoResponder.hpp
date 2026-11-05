@@ -18,7 +18,10 @@ class EchoResponder final : public EchoResponderComponentBase {
     void configure(ComCfg::Apid::T telemetryApid);
 
   private:
-    void cfsCommandIn_handler(FwIndexType portNum, U8 functionCode, Fw::Buffer& data) override;
+    void cfsCommandIn_handler(FwIndexType portNum,
+                              const ComCfg::Apid& apid,
+                              U8 functionCode,
+                              Fw::Buffer& data) override;
     void cfsTelemetryReturnIn_handler(FwIndexType portNum,
                                       Fw::Buffer& data,
                                       const ComCfg::FrameContext& context) override;

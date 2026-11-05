@@ -89,7 +89,10 @@ void EchoCommander ::cfsCommandReturnIn_handler(FwIndexType portNum,
     this->m_inFlight = false;
 }
 
-void EchoCommander ::cfsTelemetryIn_handler(FwIndexType portNum, const FPrimeCfs::CfsTime& sysTime, Fw::Buffer& data) {
+void EchoCommander ::cfsTelemetryIn_handler(FwIndexType portNum,
+                                            const ComCfg::Apid& apid,
+                                            const FPrimeCfs::CfsTime& sysTime,
+                                            Fw::Buffer& data) {
     const U32 size = static_cast<U32>(data.getSize());
     if (!this->m_outstanding) {
         this->m_echoesUnexpected++;
