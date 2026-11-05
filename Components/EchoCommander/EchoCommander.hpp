@@ -2,6 +2,7 @@
 #define FPrimeApp_EchoCommander_HPP
 
 #include "Components/EchoCommander/EchoCommanderComponentAc.hpp"
+#include "config/FppConstantsAc.hpp"
 #include "Components/EchoCommander/FppConstantsAc.hpp"
 
 namespace FPrimeApp {
@@ -9,7 +10,7 @@ namespace FPrimeApp {
 class EchoCommander final : public EchoCommanderComponentBase {
   public:
     //! Function code the raw cFS commanded app expects for the echo command
-    static constexpr U8 ECHO_FUNCTION_CODE = 1;
+    static constexpr U8 ECHO_FUNCTION_CODE = static_cast<U8>(ComCfg::EchoFunctionCode);
 
     explicit EchoCommander(const char* const compName);
     ~EchoCommander();

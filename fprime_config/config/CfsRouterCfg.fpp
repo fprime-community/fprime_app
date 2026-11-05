@@ -29,7 +29,7 @@ module FPrimeCfs {
         { apid = ComCfg.Apid.FW_PACKET_COMMAND, functionCode = ComCfg.FprimeCommandFunctionCode, routeType = CfsRouteType.FPRIME_COMMAND, portIndex = 0 },
         { apid = ComCfg.Apid.FW_PACKET_FILE,    functionCode = 0, routeType = CfsRouteType.FILE,           portIndex = 0 },
         { apid = ComCfg.Apid.CFS_SCH_TICK,      functionCode = 0, routeType = CfsRouteType.CFS_COMMAND,    portIndex = 0 },
-        { apid = ComCfg.Apid.FPRIME_ECHO_CMD,   functionCode = 1, routeType = CfsRouteType.CFS_COMMAND,    portIndex = 1 },
+        { apid = ComCfg.Apid.FPRIME_ECHO_CMD,   functionCode = ComCfg.EchoFunctionCode, routeType = CfsRouteType.CFS_COMMAND,    portIndex = 1 },
         { apid = ComCfg.Apid.RAW_ECHO_TLM,      functionCode = 0, routeType = CfsRouteType.CFS_TELEMETRY,  portIndex = 0 },
     ]
 }

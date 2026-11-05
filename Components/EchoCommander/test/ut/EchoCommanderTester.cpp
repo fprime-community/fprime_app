@@ -118,7 +118,7 @@ void EchoCommanderTester ::testEchoMismatch() {
 void EchoCommanderTester ::testEchoUnexpected() {
     U8 bytes[3] = {0x11, 0x22, 0x33};
     Fw::Buffer telemetry(bytes, sizeof(bytes));
-    this->invoke_to_cfsTelemetryIn(0, FPrimeCfs::CfsTime(0, 0), telemetry);
+    this->invoke_to_cfsTelemetryIn(0, ComCfg::Apid::RAW_ECHO_TLM, FPrimeCfs::CfsTime(0, 0), telemetry);
     ASSERT_from_bufferReturnOut_SIZE(1);
     ASSERT_EQ(this->fromPortHistory_bufferReturnOut->at(0).fwBuffer.getData(), bytes);
     ASSERT_EVENTS_SIZE(1);
