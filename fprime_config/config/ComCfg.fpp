@@ -16,6 +16,10 @@ module ComCfg {
     @ Function code carried in the cFS command secondary header of F Prime passthrough commands
     dictionary constant FprimeCommandFunctionCode = 0
 
+    @ Function code of the raw cFS echo command: raw_commander -> EchoResponder and EchoCommander -> raw_commanded.
+    @ Single source for the router route table and the Echo components (the raw C apps carry their own #define).
+    constant EchoFunctionCode = 1
+
     @ Upper Bound on Fixed size of CCSDS AOS frames
     constant AosMaxFrameFixedSize = 1536
 
