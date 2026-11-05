@@ -27,6 +27,8 @@ module FPrimeApp {
   # ----------------------------------------------------------------------
     instance rateGroupDriver
     instance rateGroup1
+    instance echoResponder
+    instance echoCommander
 
   # ----------------------------------------------------------------------
   # Pattern graph specifiers
@@ -65,6 +67,7 @@ module FPrimeApp {
       rateGroup1.RateGroupMemberOut[2] -> CfsCore.Subtopology.healthRun
       rateGroup1.RateGroupMemberOut[3] -> CfsCore.Subtopology.eventsRun
       rateGroup1.RateGroupMemberOut[4] -> ComCfs.Subtopology.bufferManagerSchedIn
+      rateGroup1.RateGroupMemberOut[5] -> echoCommander.run
     }
 
     connections Commanding {
@@ -77,6 +80,20 @@ module FPrimeApp {
       # Event and packetized telemetry downlink through the telemetry app bridge
       CfsCore.Subtopology.eventsPktSend      -> ComCfs.Subtopology.comIn[Ports_ComPacketQueue.EVENTS]
       CfsCore.Subtopology.tlmSendPktSend[0]  -> ComCfs.Subtopology.comIn[Ports_ComPacketQueue.TELEMETRY]
+    }
+
+    @ Raw cFS inter-app echo loops: opaque payloads, cFS headers/checksum/time added by ComCfs
+    connections RawCfsEcho {
+      # raw_commander -> EchoResponder -> raw_commander
+      ComCfs.Subtopology.cfsCommandOut[1]           -> echoResponder.cfsCommandIn
+      echoResponder.bufferReturnOut                 -> ComCfs.Subtopology.bufferReturnIn
+      echoResponder.cfsTelemetryOut                 -> ComCfs.Subtopology.cfsTelemetryDataIn
+      ComCfs.Subtopology.cfsTelemetryDataReturnOut  -> echoResponder.cfsTelemetryReturnIn
+      # EchoCommander -> raw_commanded -> EchoCommander
+      echoCommander.cfsCommandOut                   -> ComCfs.Subtopology.cfsCommandDataIn
+      ComCfs.Subtopology.cfsCommandDataReturnOut    -> echoCommander.cfsCommandReturnIn
+      ComCfs.Subtopology.cfsTelemetryOut[0]         -> echoCommander.cfsTelemetryIn
+      echoCommander.bufferReturnOut                 -> ComCfs.Subtopology.bufferReturnIn
     }
 
     connections Time {

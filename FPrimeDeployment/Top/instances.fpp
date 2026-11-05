@@ -39,4 +39,8 @@ module FPrimeApp {
 
   instance rateGroupDriver: Svc.RateGroupDriver base id 0x10011000
 
+  instance echoResponder: FPrimeApp.EchoResponder base id 0x10020000
+
+  instance echoCommander: FPrimeApp.EchoCommander base id 0x10021000
+
 }

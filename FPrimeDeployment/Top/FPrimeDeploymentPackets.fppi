@@ -12,6 +12,18 @@ telemetry packets FPrimeDeploymentPackets {
     ComCfs.commsBufferManager.EmptyBuffs
 
     FPrimeApp.rateGroup1.RgCycleSlips
+    # Raw cFS inter-app echo loop event counters
+    FPrimeApp.echoResponder.CommandsReceived
+    FPrimeApp.echoResponder.EchoesSent
+    FPrimeApp.echoResponder.UnexpectedFunctionCodes
+    FPrimeApp.echoResponder.PayloadsTooLarge
+    FPrimeApp.echoResponder.EchoesBusy
+    FPrimeApp.echoCommander.CommandsSent
+    FPrimeApp.echoCommander.EchoesMatched
+    FPrimeApp.echoCommander.EchoMismatches
+    FPrimeApp.echoCommander.EchoesUnexpected
+    FPrimeApp.echoCommander.EchoTimeouts
+    FPrimeApp.echoCommander.CommandsBusy
   }
 
 } omit {
